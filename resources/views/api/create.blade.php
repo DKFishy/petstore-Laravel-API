@@ -3,7 +3,7 @@
 <form action="{{ route('pets.create') }}" method="POST">
     @csrf
 
-    <!-- pole tekstowe akpcetują tylko litery alfabetu, spacje, apostrofy, litery specjalne  -->
+    <!-- text fields only accept letters, spaces, apostrophes, special letters  -->
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" required placeholder="Pet name">
     <label for="category">Category name:</label>
