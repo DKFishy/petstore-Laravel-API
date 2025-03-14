@@ -59,16 +59,22 @@ class ApiController extends Controller
             ],
         ];
 
-        $url = "https://petstore.swagger.io/v2/pet/";
-        $response = $petId ? Http::put($url, $data) : Http::post($url, $data); //dd($response->json());
+	if (!$petId) {
+        $checkResponse = Http::get("https://petstore.swagger.io/v2/pet/{$data['id']}");
 
+        	// If the pet exists, prevent duplicate creation
+        	if ($checkResponse->successful()) {
+            		return redirect()->route('pets.add')->with('error', 'Pet ID already exists. Creation failed.');
+        	}
+    	}
 
-        if ($response->successful()) {
-        //dd($response->json());
-            return redirect()->route('pets')->with('success', $petId ? 'Pet updated successfully!' : 'Pet created successfully!');
-        } else {
-            return redirect()->route($petId ? 'pets.editForm' : 'pets.add', ['petId' => $petId])->with('error', 'Failed to save pet. Please try again.');
-        }
+    // Choose request method (PUT for updates, POST for new entries)
+    $url = "https://petstore.swagger.io/v2/pet/";
+    $response = $petId ? Http::put($url, $data) : Http::post($url, $data);
+
+    return $response->successful()
+        ? redirect()->route('pets')->with('success', $petId ? 'Pet updated successfully!' : 'Pet created successfully!')
+        : redirect()->route('pets.add')->with('error', 'Failed to save pet. Please try again.');
     }
 
     public function destroy($petId)
